@@ -1,0 +1,22 @@
+{
+  "_comment": "Credentials are never committed. Values are resolved from environment variables / CI secrets.",
+  "default": "valid",
+  "datasets": {
+    "valid": {
+      "username": "${BOOKING_USERNAME}",
+      "password": "${BOOKING_PASSWORD}"
+    },
+    "wrong_password": {
+      "username": "${BOOKING_USERNAME}",
+      "password": "Not-The-Real-Passw0rd!"
+    },
+    "unregistered_user": {
+      "username": "no.such.user.qa@example.com",
+      "password": "Any-Passw0rd!"
+    },
+    "malformed_email": {
+      "username": "not-an-email",
+      "password": "Any-Passw0rd!"
+    }
+  }
+}

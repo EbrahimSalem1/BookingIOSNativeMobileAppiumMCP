@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.booking.automation</groupId>
+    <artifactId>ios-booking-automation</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    <name>iOS Booking Automation Framework</name>
+    <description>Native iOS automation framework: Appium (XCUITest) + Java + Cucumber + TestNG + Allure, AI-agent and Appium MCP assisted.</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Versions are pinned for reproducible builds. Check for updates with:
+             mvn versions:display-dependency-updates -->
+        <appium.java-client.version>9.4.0</appium.java-client.version>
+        <cucumber.version>7.20.1</cucumber.version>
+        <testng.version>7.10.2</testng.version>
+        <allure.version>2.29.0</allure.version>
+        <aspectj.version>1.9.22.1</aspectj.version>
+        <jackson.version>2.18.2</jackson.version>
+        <assertj.version>3.26.3</assertj.version>
+        <logback.version>1.5.12</logback.version>
+        <surefire.version>3.5.2</surefire.version>
+
+        <!-- Runtime switches (override on the command line) -->
+        <env>local</env>
+        <suite.xml>testng.xml</suite.xml>
+        <cucumber.filter.tags>not @wip</cucumber.filter.tags>
+        <threads>1</threads>
+    </properties>
+
+    <dependencies>
+        <!-- Appium Java client (brings Selenium 4 / W3C protocol transitively) -->
+        <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>${appium.java-client.version}</version>
+        </dependency>
+
+        <!-- BDD -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-testng</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+        <dependency>
+            <!-- Constructor injection of per-scenario state into step classes -->
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+        </dependency>
+
+        <!-- Reporting -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-cucumber7-jvm</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+
+        <!-- Config + test data (YAML config, JSON data) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- Assertions with readable failure messages -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+        </dependency>
+
+        <!-- Logging (SLF4J API comes from Selenium/Appium) -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <compilerArgs>
+                        <arg>-Xlint:all,-processing</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/${suite.xml}</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
+                    <properties>
+                        <!-- Number of scenarios executed in parallel (one device per thread) -->
+                        <property>
+                            <name>dataproviderthreadcount</name>
+                            <value>${threads}</value>
+                        </property>
+                    </properties>
+                    <systemPropertyVariables>
+                        <env>${env}</env>
+                        <cucumber.filter.tags>${cucumber.filter.tags}</cucumber.filter.tags>
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                    </systemPropertyVariables>
+                    <!-- CI sets -Dmaven.test.failure.ignore=true on the first pass so the
+                         rerun pass (-Prerun) and report generation still execute. -->
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>2.15.2</version>
+                <configuration>
+                    <reportVersion>${allure.version}</reportVersion>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Device-free checks: domain logic, config, test data, and code-convention guardrails.
+             Runs anywhere (Linux CI, pre-commit) in seconds:  mvn test -Punit -->
+        <profile>
+            <id>unit</id>
+            <properties>
+                <suite.xml>testng-unit.xml</suite.xml>
+            </properties>
+        </profile>
+
+        <!-- Re-run only scenarios that failed in the previous run (see rerun plugin in TestRunner) -->
+        <profile>
+            <id>rerun</id>
+            <properties>
+                <suite.xml>testng-rerun.xml</suite.xml>
+            </properties>
+        </profile>
+    </profiles>
+</project>

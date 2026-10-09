@@ -1,0 +1,10 @@
+{
+  "_comment": "Maps business sort options to the app's on-screen labels. Update labels here when product copy changes.",
+  "default": "PRICE_LOW_TO_HIGH",
+  "labels": {
+    "PRICE_LOW_TO_HIGH": "Price (lowest first)",
+    "PRICE_HIGH_TO_LOW": "Price (highest first)",
+    "RATING_HIGH_TO_LOW": "Rating (highest first)",
+    "RECOMMENDED": "Recommended"
+  }
+}

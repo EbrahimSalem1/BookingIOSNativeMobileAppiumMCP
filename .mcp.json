@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "appium-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "appium-mcp@latest"],
+      "env": {
+        "CAPABILITIES_CONFIG": "./ai/mcp/capabilities.json"
+      }
+    }
+  }
+}

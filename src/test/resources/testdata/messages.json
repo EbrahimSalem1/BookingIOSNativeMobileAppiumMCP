@@ -1,0 +1,6 @@
+{
+  "_comment": "Expected user-facing copy (partial, case-insensitive match). Keeps assertions independent of exact wording changes.",
+  "login.invalidCredentials": "invalid",
+  "login.malformedEmail": "valid email",
+  "search.noResults": "no results"
+}

@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!-- Device suite. Parallelism comes from the Cucumber data provider (-Dthreads=N -> data-provider-thread-count). -->
+<suite name="iOS Booking - Cucumber" verbose="1">
+    <test name="Booking scenarios">
+        <classes>
+            <class name="com.booking.automation.runners.TestRunner"/>
+        </classes>
+    </test>
+</suite>

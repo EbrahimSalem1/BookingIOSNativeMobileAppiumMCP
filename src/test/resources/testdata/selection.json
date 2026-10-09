@@ -1,0 +1,4 @@
+{
+  "_comment": "How 'a valid result' is chosen: FIRST_BOOKABLE | CHEAPEST | HIGHEST_RATED. Skips sold-out and price-less cards.",
+  "strategy": "FIRST_BOOKABLE"
+}

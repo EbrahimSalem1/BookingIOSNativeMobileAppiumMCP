@@ -1,0 +1,132 @@
+name: iOS E2E
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 1 * * *"          # nightly regression
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: Cucumber tag expression
+        default: "@smoke"
+      threads:
+        description: Parallel simulators
+        default: "2"
+
+concurrency:
+  group: ios-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "17"
+  IOS_VERSION: "17.5"
+  DEVICE_TYPE: "iPhone 15"
+
+jobs:
+  # ------------------------------------------------------------------ fast, device-free gate
+  framework-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "${{ env.JAVA_VERSION }}", cache: maven }
+      - name: Unit tests + coding-convention guardrails
+        run: mvn -B -q test -Punit
+
+  # ------------------------------------------------------------------ simulator run
+  ios-simulator:
+    needs: framework-checks
+    runs-on: macos-14
+    timeout-minutes: 90
+    env:
+      TAGS: ${{ github.event.inputs.tags || (github.event_name == 'schedule' && '@regression or @smoke' || '@smoke') }}
+      THREADS: ${{ github.event.inputs.threads || '2' }}
+      BOOKING_USERNAME: ${{ secrets.BOOKING_USERNAME }}
+      BOOKING_PASSWORD: ${{ secrets.BOOKING_PASSWORD }}
+      BOOKING_BUNDLE_ID: ${{ vars.BOOKING_BUNDLE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "${{ env.JAVA_VERSION }}", cache: maven }
+
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      # The app build comes from the iOS team's pipeline (simulator .app zipped as an artifact/release).
+      - name: Download app under test
+        run: |
+          mkdir -p apps
+          gh release download --repo "${{ vars.APP_RELEASE_REPO }}" --pattern '*-simulator.zip' --dir apps
+          unzip -q apps/*-simulator.zip -d apps
+          echo "BOOKING_APP_PATH=$(ls -d "$PWD"/apps/*.app | head -1)" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ secrets.APP_DOWNLOAD_TOKEN }}
+
+      - name: Boot simulators (one per thread)
+        run: |
+          chmod +x scripts/*.sh
+          echo "DEVICE_POOL=$(./scripts/boot-simulators.sh "$THREADS" "$DEVICE_TYPE" "$IOS_VERSION" | tail -1)" >> "$GITHUB_ENV"
+
+      - name: Cache WebDriverAgent build
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData/WebDriverAgent-*
+          key: wda-${{ runner.os }}-xcode15.4
+
+      - name: Start Appium
+        run: ./scripts/start-appium.sh
+
+      - name: Run scenarios
+        run: >
+          mvn -B test -Denv=ci
+          -Dcucumber.filter.tags="$TAGS"
+          -Dthreads="$THREADS"
+          -Dmaven.test.failure.ignore=true
+
+      - name: Re-run failures once (flaky detection)
+        if: hashFiles('target/rerun/failed.txt') != ''
+        run: |
+          if [ -s target/rerun/failed.txt ]; then
+            mvn -B test -Prerun -Denv=ci -Dthreads="$THREADS" -Dmaven.test.failure.ignore=true
+          fi
+
+      - name: AI failure analysis
+        if: always()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 ai/failure-analyzer/analyze_failures.py --results target/allure-results ${ANTHROPIC_API_KEY:+--llm}
+
+      - name: Allure report
+        if: always()
+        run: mvn -B -q allure:report
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-e2e-${{ github.run_number }}
+          retention-days: 14
+          path: |
+            target/site/allure-maven-plugin
+            target/allure-results
+            target/ai-failure-analysis.*
+            target/locator-drift-report.json
+            target/logs
+            target/appium-server.log
+
+      - name: Verdict
+        run: |
+          FINAL=target/rerun/failed.txt
+          [ -f target/rerun/failed-after-rerun.txt ] && FINAL=target/rerun/failed-after-rerun.txt
+          if [ -s "$FINAL" ]; then echo "::error::Scenarios still failing after one rerun"; cat "$FINAL"; exit 1; fi
+
+      - name: Stop Appium
+        if: always()
+        run: kill "$(cat target/appium.pid)" 2>/dev/null || true

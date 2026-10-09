@@ -1,0 +1,21 @@
+# CI (macOS runner): Appium is started by the pipeline; simulators are pre-booted by
+# scripts/boot-simulators.sh which exports DEVICE_POOL with UDIDs for parallel runs.
+appium:
+  url: ${APPIUM_URL:-http://127.0.0.1:4723}
+  startLocal: false
+
+device:
+  pool: ${DEVICE_POOL:-iPhone 15}
+  platformVersion: ${IOS_VERSION:-17.5}
+
+session:
+  wdaLaunchTimeoutSeconds: 240     # cold WDA build on fresh runners is slow
+  createRetries: 3
+
+wait:
+  explicitSeconds: 25              # shared CI hardware is slower than a laptop
+  longSeconds: 60
+
+capabilities:
+  "appium:usePrebuiltWDA": ${USE_PREBUILT_WDA:-false}
+  "appium:derivedDataPath": ${WDA_DERIVED_DATA:-}

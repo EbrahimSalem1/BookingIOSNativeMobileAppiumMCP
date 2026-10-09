@@ -1,0 +1,8 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="iOS Booking - Rerun failed" verbose="1">
+    <test name="Rerun failed scenarios">
+        <classes>
+            <class name="com.booking.automation.runners.RerunFailedRunner"/>
+        </classes>
+    </test>
+</suite>

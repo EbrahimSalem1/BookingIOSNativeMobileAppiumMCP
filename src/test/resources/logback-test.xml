@@ -1,0 +1,23 @@
+<configuration>
+    <!-- Thread + scenario name on every line: essential when scenarios run in parallel. -->
+    <property name="PATTERN" value="%d{HH:mm:ss.SSS} %-5level [%thread] [%X{scenario:-}] %logger{20} - %msg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder><pattern>${PATTERN}</pattern></encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>target/logs/test-run.log</file>
+        <append>false</append>
+        <encoder><pattern>${PATTERN}</pattern></encoder>
+    </appender>
+
+    <logger name="com.booking.automation" level="${LOG_LEVEL:-INFO}"/>
+    <logger name="io.appium" level="WARN"/>
+    <logger name="org.openqa.selenium" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

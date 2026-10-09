@@ -1,0 +1,26 @@
+{
+  "_comment": "uiLabel = the app's wording on the filter screen; type + value = the business rule that is verified on every result.",
+  "default": "price_under_200",
+  "datasets": {
+    "price_under_200": {
+      "type": "PRICE_MAX",
+      "uiLabel": "Under $200",
+      "value": "200"
+    },
+    "rating_4_plus": {
+      "type": "MIN_RATING",
+      "uiLabel": "4+ stars",
+      "value": "4"
+    },
+    "hotels_only": {
+      "type": "PROPERTY_TYPE",
+      "uiLabel": "Hotel",
+      "value": "Hotel"
+    },
+    "available_only": {
+      "type": "AVAILABLE_ONLY",
+      "uiLabel": "Available only",
+      "value": null
+    }
+  }
+}

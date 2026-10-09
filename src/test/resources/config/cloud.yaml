@@ -1,0 +1,23 @@
+# Real-device cloud (BrowserStack / Sauce Labs / LambdaTest style). Device matrix is driven by
+# DEVICE_POOL, e.g. "iPhone 15@@17,iPhone 13@@16,iPhone SE 2022@@15" (name@udid@version, udid empty).
+appium:
+  url: ${CLOUD_HUB_URL}
+  startLocal: false
+
+app:
+  path: ${CLOUD_APP_ID}            # e.g. bs://<hash> after uploading the .ipa
+
+device:
+  pool: ${DEVICE_POOL}
+  platformVersion: ${IOS_VERSION:-17}
+  real: true
+
+session:
+  wdaLaunchTimeoutSeconds: 300
+
+capabilities:
+  "bstack:options":
+    userName: ${CLOUD_USERNAME}
+    accessKey: ${CLOUD_ACCESS_KEY}
+    projectName: Booking iOS
+    buildName: ${BUILD_TAG:-local}

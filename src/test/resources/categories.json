@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Locator / UI change",
+    "description": "Element not found - likely a changed accessibility id or screen layout. Check target/locator-drift-report.json and verify with Appium MCP.",
+    "matchedStatuses": ["broken", "failed"],
+    "traceRegex": ".*(NoSuchElementException|not found on|to be (visible|present) on).*"
+  },
+  {
+    "name": "Business rule violation (probable product bug)",
+    "description": "The app behaved, but not as specified: wrong order, filter leak, details mismatch.",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*(ordered by|satisfies|property name|price on details|mentions).*"
+  },
+  {
+    "name": "Synchronisation / performance",
+    "description": "A condition did not happen within the timeout: slow backend, missing loader, or animation.",
+    "matchedStatuses": ["broken", "failed"],
+    "traceRegex": ".*TimeoutException.*"
+  },
+  {
+    "name": "Infrastructure (Appium / WDA / simulator)",
+    "description": "Session could not be created or was lost. Not a product signal.",
+    "matchedStatuses": ["broken"],
+    "traceRegex": ".*(SessionNotCreatedException|WebDriverAgent|xcodebuild|ECONNREFUSED|invalid session id).*"
+  },
+  {
+    "name": "Test data / configuration",
+    "description": "Missing credentials, unknown dataset alias or invalid config.",
+    "matchedStatuses": ["broken"],
+    "traceRegex": ".*(TestDataException|ConfigurationException).*"
+  }
+]

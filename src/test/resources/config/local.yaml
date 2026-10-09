@@ -1,0 +1,9 @@
+# Local developer machine: framework manages its own Appium server, fast session reuse.
+appium:
+  startLocal: true
+
+session:
+  lifecycle: PER_SCENARIO
+
+evidence:
+  video: NEVER

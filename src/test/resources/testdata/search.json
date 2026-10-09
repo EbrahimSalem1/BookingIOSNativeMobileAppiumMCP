@@ -1,0 +1,35 @@
+{
+  "_comment": "Dates are offsets from today so data never expires. relevanceKeyword defaults to destination.",
+  "default": "paris_weekend",
+  "datasets": {
+    "paris_weekend": {
+      "destination": "Paris",
+      "relevanceKeyword": "Paris",
+      "checkInInDays": 30,
+      "nights": 2,
+      "adults": 2,
+      "rooms": 1
+    },
+    "london_business_trip": {
+      "destination": "London",
+      "checkInInDays": 14,
+      "nights": 3,
+      "adults": 1,
+      "rooms": 1
+    },
+    "cairo_family": {
+      "destination": "Cairo",
+      "checkInInDays": 60,
+      "nights": 5,
+      "adults": 2,
+      "rooms": 1
+    },
+    "no_results": {
+      "destination": "Zzyzxqw",
+      "checkInInDays": 30,
+      "nights": 1,
+      "adults": 1,
+      "rooms": 1
+    }
+  }
+}

@@ -1,0 +1,10 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!-- Device-free framework tests: run on any OS in seconds (mvn test -Punit). -->
+<suite name="Framework unit tests" verbose="1">
+    <test name="Domain, config, data and conventions">
+        <packages>
+            <package name="com.booking.automation.unit"/>
+            <package name="com.booking.automation.driver"/>
+        </packages>
+    </test>
+</suite>

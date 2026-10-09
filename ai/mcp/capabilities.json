@@ -1,0 +1,13 @@
+{
+  "_comment": "Session capabilities the Appium MCP server uses when an agent asks it to create an iOS session. Keep in sync with src/test/resources/config/default.yaml so the agent explores the same app/device the suite runs on.",
+  "ios": {
+    "platformName": "iOS",
+    "appium:automationName": "XCUITest",
+    "appium:deviceName": "iPhone 15",
+    "appium:platformVersion": "17.5",
+    "appium:bundleId": "com.example.booking",
+    "appium:noReset": true,
+    "appium:newCommandTimeout": 600,
+    "appium:reduceMotion": true
+  }
+}

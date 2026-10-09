@@ -1,0 +1,61 @@
+# ---------------------------------------------------------------------------
+# Defaults shared by every environment. Profiles (local.yaml, ci.yaml, cloud.yaml)
+# override only what differs. Any key can be overridden at runtime:
+#   -Ddevice.pool="iPhone 15 Pro"      or      export DEVICE_POOL="iPhone 15 Pro"
+# ---------------------------------------------------------------------------
+
+appium:
+  url: http://127.0.0.1:4723
+  startLocal: false          # true = framework starts/stops Appium itself
+  port: 4723
+  logLevel: info
+
+app:
+  # .app (simulator) / .ipa (device) / remote URL. Leave empty to attach to an installed app.
+  path: ${BOOKING_APP_PATH:-}
+  bundleId: ${BOOKING_BUNDLE_ID:-com.example.booking}
+
+device:
+  # Comma-separated pool. Entry format: "<name>[@<udid>[@<iOS version>]]".
+  # One entry per parallel thread. WDA ports are allocated from wdaBasePort upwards.
+  pool: iPhone 15
+  platformVersion: "17.5"
+  real: false
+  wdaBasePort: 8100
+  xcodeOrgId: ${XCODE_ORG_ID:-}
+  xcodeSigningId: Apple Development
+
+session:
+  lifecycle: PER_SCENARIO    # PER_SCENARIO (isolation) | PER_THREAD (speed; relaunches app)
+  noReset: false
+  newCommandTimeoutSeconds: 120
+  wdaLaunchTimeoutSeconds: 120
+  createRetries: 2
+
+wait:
+  explicitSeconds: 15
+  shortSeconds: 3
+  longSeconds: 45
+  pollingMillis: 300
+
+search:
+  setDates: false            # true when the app requires explicit dates (no prefill)
+  setGuests: false
+  calendarDayLabelPattern: "EEEE, MMMM d"
+
+results:
+  sampleSize: 10             # results harvested to verify sort/filter rules
+  maxScrolls: 8
+
+evidence:
+  screenshot: ON_FAILURE     # ON_FAILURE | EACH_STEP | NEVER
+  pageSourceOnFailure: true
+  video: ON_FAILURE          # ON_FAILURE | NEVER
+
+# Pass-through capabilities (keys used verbatim). Examples of useful XCUITest settings:
+capabilities:
+  "appium:autoAcceptAlerts": false       # handled explicitly so permission flows stay testable
+  "appium:reduceMotion": true            # fewer animations = fewer timing issues
+  "appium:shouldUseSingletonTestManager": false
+  "appium:language": en
+  "appium:locale": en_US
