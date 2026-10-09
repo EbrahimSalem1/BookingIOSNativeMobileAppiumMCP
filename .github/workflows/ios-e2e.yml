@@ -35,10 +35,16 @@ jobs:
         with: { distribution: temurin, java-version: "${{ env.JAVA_VERSION }}", cache: maven }
       - name: Unit tests + coding-convention guardrails
         run: mvn -B -q test -Punit
+      - name: Report device-run configuration
+        if: ${{ vars.APP_RELEASE_REPO == '' || vars.BOOKING_BUNDLE_ID == '' }}
+        run: |
+          echo "::notice title=Simulator run skipped::Set repository variables APP_RELEASE_REPO and BOOKING_BUNDLE_ID and secrets BOOKING_USERNAME, BOOKING_PASSWORD, APP_DOWNLOAD_TOKEN (see docs/CI_SETUP.md)."
 
   # ------------------------------------------------------------------ simulator run
+  # Runs only once the app build source is configured, so an unconfigured fork/repo stays green.
   ios-simulator:
     needs: framework-checks
+    if: ${{ vars.APP_RELEASE_REPO != '' && vars.BOOKING_BUNDLE_ID != '' }}
     runs-on: macos-14
     timeout-minutes: 90
     env:

@@ -274,6 +274,7 @@ flowchart LR
 
 - PR: `@smoke`, 2 simulators. Nightly: `@regression or @smoke`. Manual: any tags/threads.
 - Device-free checks run first on cheap Linux runners and block the expensive macOS job.
+- The simulator job is skipped until secrets/variables are configured: see [docs/CI_SETUP.md](docs/CI_SETUP.md).
 - Real devices: `Jenkinsfile` targets a labelled Mac agent pool with USB devices; device sets are locked per run.
 
 ## 11. AI approach
